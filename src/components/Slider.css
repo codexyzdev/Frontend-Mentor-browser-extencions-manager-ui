@@ -1,0 +1,50 @@
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 40px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 26px;
+  transition: background 0.3s ease-in-out;
+  background: var(--color-slider);
+  border-radius: 25px;
+}
+
+/* Thumb (el control deslizante) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: var(--color-neutral-0);
+  border-radius: 50%;
+  transition: transform 0.2s;
+  margin-top: 1.5px;
+  cursor: pointer;
+  transform: scale(0.7);
+}
+
+/* Para Firefox
+input[type="range"]::-moz-range-track {
+  height: 30px;
+  background: var(--toggle-keypad-bg);
+  border-radius: 25px;
+} */
+
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: var(--toggle-button);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(0.8);
+}
+
+/* input[type="range"]:active::-webkit-slider-thumb {
+  background: var(--color-red-500);
+} */
