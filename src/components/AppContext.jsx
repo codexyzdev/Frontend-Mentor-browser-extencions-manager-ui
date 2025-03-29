@@ -1,41 +1,68 @@
-import { createContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 
 export const AppContext = createContext();
+
 export const AppProvider = ({ children }) => {
-  const [appState, setAppState] = useState();
+  const [appState, setAppState] = useState([]);
   const [filtered, setFiltered] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const removeItem = (id) => {
-    setAppState(prevItems => prevItems.filter(item => item.name !== id));
-  };
-
-  const toggleItemActive = (id) => {
-    setAppState(appState =>
-      appState.map(item =>
-        item.name === id ? { ...item, isActive: !item.isActive } : item
-      )
-    );
-  };
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetch("./data.json"); // Reemplaza con tu URL
+        const response = await fetch("./data.json");
         if (!response.ok) {
-          throw new Error("Error al obtener los datos");
+          throw new Error(`Error HTTP: ${response.status}`);
         }
         const jsonData = await response.json();
         setAppState(jsonData);
       } catch (err) {
-        console.log(err);
+        console.error("Error al obtener los datos:", err);
+        setError(err.message || "Ocurrió un error al cargar los datos.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
+  const removeItem = useCallback((id) => {
+    setAppState((prevItems) => prevItems.filter((item) => item.name !== id));
+  }, []);
+
+  const toggleItemActive = useCallback((id) => {
+    setAppState((prevItems) =>
+      prevItems.map((item) =>
+        item.name === id ? { ...item, isActive: !item.isActive } : item
+      )
+    );
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      appState,
+      setAppState,
+      filtered,
+      setFiltered,
+      removeItem,
+      toggleItemActive,
+      isLoading,
+      error,
+    }),
+    [appState, filtered, removeItem, toggleItemActive, isLoading, error]
+  );
+
   return (
-    <AppContext.Provider value={{ appState, setAppState, filtered, setFiltered,removeItem,toggleItemActive }}>
-      {children}
-    </AppContext.Provider>
+    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
   );
 };
